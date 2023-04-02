@@ -4,12 +4,22 @@ import '../styles/App.css';
 const App = () => {
   const [category, setCategory] = useState("general");
   const [newsData, setNewsData] = useState([]);
-  const [loading, setLoading] = useState();
+  const [loading, setLoading] = useState(true);
+  const API_KEY = "42b084c8c3e2f1ee78066fc665e7f994";
+  const handleChange=()=>{
+    setCategory(e.target.value);
+  }
+  useEffect(()=>{
+    setLoading(true);
+    fetch('https://gnews.io/api/v4/top-headlines?category=${category}&lang=en&country=us&max=10&apikey=${API_KEY}').then(res=>res.json()).then((res)=>{
+      setNewsData(res.articles);
+    }).then(()=>setLoading(false));
+  },[category])
 
   return (
     <div id="main">
       <h1 className='heading'>Top 10 {category} news.</h1>
-      <select value={category}>
+      <select value={category} onChange={handleChange}>
         <option value="general">General</option>
         <option value="business">Business</option>
         <option value="sports">Sports</option>
@@ -18,19 +28,23 @@ const App = () => {
         <option value="entertainment">Entertainment</option>
         <option value="science">Science</option>
       </select>
-      <p className='loader'>Loading...</p>
+      {loading && 
+      <p className='loader'>Loading...</p>}
+       {!loading &&
       <ol>
-        <li key="">
-          <img className='news-img' src="" alt=""/>
+         {newsData.map((e,i)=>{
+           return(<li key={i}>
+          <img className='news-img' src={e.image} alt=""/>
           <section className='new-title-content-author'>
-            <h3 className='news-title'>news title</h3>
+            <h3 className='news-title'>{e.title}</h3>
             <section className='new-content-author'>
-              <p className='news-description'>news description</p>
-              <p className='news-source'><strong>Source:</strong> source name</p>
+              <p className='news-description'>{e.description}</p>
+              <p className='news-source'><strong>Source:</strong> {e.source.name}</p>
             </section>
           </section>
-        </li>
-      </ol>
+        </li>)
+       })
+      </ol>}
     </div>
   )
 }
