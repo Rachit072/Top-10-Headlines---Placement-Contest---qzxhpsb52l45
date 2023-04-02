@@ -44,6 +44,7 @@ const App = () => {
           </section>
         </li>)
        })
+      }
       </ol>}
     </div>
   )
